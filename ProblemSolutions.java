@@ -1,7 +1,6 @@
-
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   Xander Estevez COMP272-002
  *
  *   This java file contains the problem solutions for the methods lastBoulder,
  *   showDuplicates, and pair methods. You should utilize the Java Collection
@@ -63,13 +62,28 @@ public class ProblemSolutions {
      * returning the 0 if queue is empty else return pq.peek().
      */
 
-  public static int lastBoulder(int[] boulders) {
+    public static int lastBoulder(int[] boulders) {
 
-      //
-      // ADD YOUR CODE HERE - DO NOT FORGET TO ADD YOUR NAME / SECTION # ABOVE
-      //
-      return -1;
-  }
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+
+        for (int weight : boulders) {
+            maxHeap.offer(weight);
+        }
+
+        while (maxHeap.size() > 1) {
+
+            int larger = maxHeap.poll();
+            int smaller = maxHeap.poll();
+
+            int remainingWeight = larger - smaller;
+            if (remainingWeight > 0) {
+                maxHeap.offer(remainingWeight);
+            }
+        }
+
+        // If there is a boulder, return its weight if not return 0
+        return maxHeap.isEmpty() ? 0 : maxHeap.poll();
+    }
 
 
     /**
@@ -91,10 +105,18 @@ public class ProblemSolutions {
 
     public static ArrayList<String> showDuplicates(ArrayList<String> input) {
 
-        //
-        //  YOUR CODE GOES HERE
-        //
-        return new ArrayList<>();  // Make sure result is sorted in ascending order
+        Set<String> seen = new HashSet<>();
+        Set<String> dupes = new TreeSet<>(); // TreeSet to keep duplicates sorted
+
+        for (String str : input) {
+
+            if (!seen.add(str)) {
+                dupes.add(str);
+            }
+        }
+
+        // Convert the sorted set of duplicates to an ArrayList
+        return new ArrayList<>(dupes);  // Make sure result is sorted in ascending order
 
     }
 
@@ -131,9 +153,33 @@ public class ProblemSolutions {
 
     public static ArrayList<String> pair(int[] input, int k) {
 
-        //
-        //  YOUR CODE GOES HERE
-        //
-        return new ArrayList<>();  // Make sure returned lists is sorted as indicated above
+        Arrays.sort(input); // Sort the input array for the two-pointer technique
+        ArrayList<String> pairs = new ArrayList<>();
+        int leftPtr = 0;
+        int rightPtr = input.length - 1;
+
+        while (leftPtr < rightPtr) {
+            int sum = input[leftPtr] + input[rightPtr];
+
+            if (sum == k) {
+                pairs.add("(" + input[leftPtr] + ", " + input[rightPtr] + ")");
+                leftPtr++;
+                rightPtr--;
+
+                // Skip duplicates to ensure unique pairs in the result
+                while (leftPtr < rightPtr && input[leftPtr] == input[leftPtr - 1]) {
+                    leftPtr++;
+                }
+                while (leftPtr < rightPtr && input[rightPtr] == input[rightPtr + 1]) {
+                    rightPtr--;
+                }
+            } else if (sum < k) {
+                leftPtr++; // Increase sum by moving the leftPtr pointer rightPtr
+            } else {
+                rightPtr--; // Decrease sum by moving the rightPtr pointer leftPtr
+            }
+        }
+
+        return pairs;
     }
 }
